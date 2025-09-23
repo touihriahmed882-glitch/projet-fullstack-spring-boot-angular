@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,7 +60,7 @@ public class ProviderController {
 			return new ResponseEntity<>(opt.get(), HttpStatus.FOUND); //CODE 304
 	}
 	@Operation(summary = "Supression un provider par id", description = "supprimer un provider par id dans la base de donnees.")
-	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "suppressiom provider  avec succees"),
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "suppression provider  avec succees"),
 			@ApiResponse(responseCode = "404", description = "suppression echoue") })
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Provider> DeleteProviderById(@PathVariable int id) {
@@ -71,6 +72,25 @@ public class ProviderController {
 			return ResponseEntity.noContent().build(); //CODE 204
 			
 		}
+		
 			
+	}
+	@Operation(summary = "Mise a jourd'un provider ", description = "Mise a jour d'un provider par id dans la base de donnees.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Mise a jour avec succees"),
+			@ApiResponse(responseCode = "404", description = "Provider inexistant") })
+	@PutMapping("/")
+	public ResponseEntity<Provider> updateProvider(@RequestBody Provider provider){
+		Optional <Provider> opt = this.providerRepository.findById(provider.getId());
+		if (opt.isEmpty())
+			return ResponseEntity.notFound().build(); // CODE 404
+		else {
+			Provider savedProvider = opt.get();
+			savedProvider.setName(provider.getName());
+			savedProvider.setEamil(provider.getEmail());
+			savedProvider.setAddress(provider.getAddress());
+			return new ResponseEntity<>(providerRepository.save(savedProvider), HttpStatus.OK);
+
+		}
+		
 	}
 }
