@@ -8,6 +8,7 @@ import javax.net.ssl.SSLEngineResult.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,7 +48,7 @@ public class ProviderController {
 	}
 
 	@Operation(summary = "Recuperer un Provider par id", description = "recuperer un provider par id dans la base de donnees.")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "recuperation  avec succees"),
+	@ApiResponses(value = { @ApiResponse(responseCode = "304", description = "recuperation  avec succees"),
 			@ApiResponse(responseCode = "404", description = "provider inexistant") })
 	@GetMapping("/{id}")
 	public ResponseEntity<Provider> getProviderById(@PathVariable int id) {
@@ -55,7 +56,21 @@ public class ProviderController {
 		if (opt.isEmpty())
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		else
-			return new ResponseEntity<>(opt.get(), HttpStatus.OK);
+			return new ResponseEntity<>(opt.get(), HttpStatus.FOUND); //CODE 304
 	}
-
+	@Operation(summary = "Supression un provider par id", description = "supprimer un provider par id dans la base de donnees.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "suppressiom provider  avec succees"),
+			@ApiResponse(responseCode = "404", description = "suppression echoue") })
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Provider> DeleteProviderById(@PathVariable int id) {
+		Optional <Provider> opt = this.providerRepository.findById(id);
+		if (opt.isEmpty())
+			return ResponseEntity.notFound().build(); // CODE 404
+		else {
+			this.providerRepository.deleteById(id);
+			return ResponseEntity.noContent().build(); //CODE 204
+			
+		}
+			
+	}
 }
