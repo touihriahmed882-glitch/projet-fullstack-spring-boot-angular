@@ -8,6 +8,5 @@ public interface ProviderService {
 	public List<Provider> getAllProviders();
 	public Optional<Provider> getProviderById (int id);
 	public void DeleteProviderById(int id);
-	public Provider updateProvider(Provider provider);
 	public Provider saveProvider (Provider provider);
 }

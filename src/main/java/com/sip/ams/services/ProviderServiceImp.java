@@ -36,12 +36,7 @@ public class ProviderServiceImp implements ProviderService {
 		 this.providerRepository.deleteById(id);;
 	}
 
-	@Override
-	public Provider updateProvider(Provider provider) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	public Provider saveProvider(Provider provider) {
 		// TODO Auto-generated method stub
