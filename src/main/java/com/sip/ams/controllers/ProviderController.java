@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import com.sip.ams.entities.Provider;
 import com.sip.ams.repositories.ProviderRepository;
+import com.sip.ams.services.ProviderService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,7 +29,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RequestMapping("providers")
 public class ProviderController {
 	@Autowired
-	ProviderRepository providerRepository;
+	ProviderService providerService;
+	
 
 	@Operation(summary = "Récupération de tous les providers", description = "Retourne la liste complète des providers enregistrés dans la base de données.")
 	@ApiResponses(value = {
@@ -36,7 +38,7 @@ public class ProviderController {
 			@ApiResponse(responseCode = "500", description = "Erreur lors de la récupération des providers") })
 	@GetMapping("/")
 	public ResponseEntity<List<Provider>> getAllProviders() {
-		return new ResponseEntity<>((List<Provider>) providerRepository.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>((List<Provider>) this.providerService.getAllProviders(), HttpStatus.OK);
 	}
 
 	@Operation(summary = "Ajout un noveau provider", description = "ajouter un nv provider dans la base de donnees.")
@@ -45,15 +47,16 @@ public class ProviderController {
 	@PostMapping("/")
 	public ResponseEntity<Provider> saveProvider(@RequestBody Provider p) {
 
-		return new ResponseEntity<>(providerRepository.save(p), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.providerService.saveProvider(p), HttpStatus.CREATED);
 	}
 
 	@Operation(summary = "Recuperer un Provider par id", description = "recuperer un provider par id dans la base de donnees.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "304", description = "recuperation  avec succees"),
 			@ApiResponse(responseCode = "404", description = "provider inexistant") })
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<Provider> getProviderById(@PathVariable int id) {
-		Optional <Provider> opt = this.providerRepository.findById(id);
+		Optional <Provider> opt = this.providerService.getProviderById(id);
 		if (opt.isEmpty())
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		else
@@ -64,11 +67,11 @@ public class ProviderController {
 			@ApiResponse(responseCode = "404", description = "suppression echoue") })
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Provider> DeleteProviderById(@PathVariable int id) {
-		Optional <Provider> opt = this.providerRepository.findById(id);
+		Optional <Provider> opt = this.providerService.getProviderById(id);
 		if (opt.isEmpty())
 			return ResponseEntity.notFound().build(); // CODE 404
 		else {
-			this.providerRepository.deleteById(id);
+			this.providerService.DeleteProviderById(id);
 			return ResponseEntity.noContent().build(); //CODE 204
 			
 		}
@@ -80,7 +83,7 @@ public class ProviderController {
 			@ApiResponse(responseCode = "404", description = "Provider inexistant") })
 	@PutMapping("/")
 	public ResponseEntity<Provider> updateProvider(@RequestBody Provider provider){
-		Optional <Provider> opt = this.providerRepository.findById(provider.getId());
+		Optional <Provider> opt = this.providerService.getProviderById(provider.getId());
 		if (opt.isEmpty())
 			return ResponseEntity.notFound().build(); // CODE 404
 		else {
@@ -88,7 +91,7 @@ public class ProviderController {
 			savedProvider.setName(provider.getName());
 			savedProvider.setEamil(provider.getEmail());
 			savedProvider.setAddress(provider.getAddress());
-			return new ResponseEntity<>(providerRepository.save(savedProvider), HttpStatus.OK);
+			return new ResponseEntity<>(this.providerService.saveProvider(savedProvider), HttpStatus.OK);
 
 		}
 		
